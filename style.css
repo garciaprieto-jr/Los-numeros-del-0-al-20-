@@ -1,0 +1,142 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    color: #333;
+    text-align: center;
+    position: relative;
+
+/* Nuevas líneas para la imagen de fondo */
+    background-image: url('https://raw.githubusercontent.com/garciaprieto-jr/los-numeros-0-20---Harry-potter-juego-/6ae9555603a42cd355bdc3d629eeb67a4ac569a2/Fondo.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.hidden {
+    display: none;
+}
+
+#start-screen,
+#game-container {
+    padding: 2em;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative; /* Para el posicionamiento del contador */
+}
+
+#startButton,
+#playAudioBtn,
+#nextBtn {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    margin: 10px;
+}
+
+#options-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.option-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    height: 150px;
+    background-color: #f9f9f9;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.option-btn:hover {
+    transform: scale(1.05);
+}
+
+.option-btn.correct {
+    border-color: #4CAF50;
+    animation: pulse-correct 0.5s ease-in-out;
+}
+
+.option-btn.incorrect {
+    border-color: #E53935;
+    animation: shake 0.5s ease-in-out;
+}
+
+.option-btn span {
+    font-size: 3em;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+#feedback {
+    margin-top: 20px;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Estilo para el overlay del emoji */
+.emoji-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10em;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* Estilo para el contador de aciertos y errores */
+#score-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 500;
+}
+
+/* Animaciones */
+@keyframes pulse-correct {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+#audio-section {
+    display: flex;
+    flex-direction: column; /* Coloca los elementos uno debajo del otro */
+    align-items: center;    /* Centra los elementos horizontalmente */
+    margin-bottom: 20px;
+}
+
+#audio-section p {
+    font-size: 1em;
+    color: #555;
+    margin-top: 5px; /* Pequeño espacio entre el botón y el texto */
+}

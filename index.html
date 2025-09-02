@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Números</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+    <div id="score-container">
+        <p>Aciertos: <span id="correct-count">0</span> 😊</p>
+        <p>Errores: <span id="incorrect-count">0</span> 😔</p>
+    </div>
+
+    <div id="start-screen">
+        <h1>¡Aprende los Números!</h1>
+        <button id="startButton">Comenzar Juego</button>
+    </div>
+
+    <div id="game-container" class="hidden">
+        <div id="audio-section">
+            <button id="playAudioBtn">
+                <i class="fas fa-volume-up"></i>
+            </button>
+            <p>Haz clic para escuchar el número</p>
+        </div>
+
+        <div id="options-container">
+            </div>
+
+        <p id="feedback"></p>
+        <button id="nextBtn" class="hidden">Siguiente</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

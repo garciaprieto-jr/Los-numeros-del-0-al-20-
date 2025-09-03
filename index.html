@@ -16,7 +16,9 @@
 
     <div id="start-screen">
         <h1>¡Aprende los Números!</h1>
-        <button id="startButton">Comenzar Juego</button>
+        <button id="startGame0-10">Números del 0 al 10</button>
+        <button id="startGame11-20">Números del 11 al 20</button>
+        <button id="startGame0-20">Números del 0 al 20</button>
     </div>
 
     <div id="game-container" class="hidden">
@@ -28,12 +30,124 @@
         </div>
 
         <div id="options-container">
-            </div>
+        </div>
 
         <p id="feedback"></p>
         <button id="nextBtn" class="hidden">Siguiente</button>
+        <p id="next-countdown"></p>
+    </div>
+    
+    <div id="gameOver-screen" class="hidden game-end-screen">
+        <h2>¡Oh no!</h2>
+        <p>Has cometido 3 errores.</p>
+        <button id="playAgainBtn1" class="playAgainBtn">Volver a jugar</button>
     </div>
 
+    <div id="wellDone-screen" class="hidden game-end-screen">
+        <h2>¡Muy bien!</h2>
+        <p>¡Sigue practicando para alcanzar la puntuación perfecta!</p>
+        <button id="playAgainBtn2" class="playAgainBtn">Volver a jugar</button>
+    </div>
+    
+    <div id="perfect-screen" class="hidden game-end-screen">
+        <h2>¡Perfecto! 👍</h2>
+        <p>¡Has respondido a todas las preguntas sin cometer errores!</p>
+        <button id="playAgainBtn3" class="playAgainBtn">Volver a jugar</button>
+    </div>
+
+    <script>
+        // JSConfetti v1.1.0
+        // https://github.com/loonywizard/js-confetti
+        // (c) 2021 Tatsuya Yamakawa
+        // MIT License
+        function JSConfetti(props) {
+            this.confettiNumber = props?.confettiNumber || 150;
+            this.confettiColors = props?.confettiColors || [
+                '#fce18a', '#ff726d', '#b48bff', '#b7feff'
+            ];
+            this.confettiRadius = props?.confettiRadius || 6;
+            this.confettiAnimEnter = props?.confettiAnimEnter || 300;
+            this.canvas = document.createElement('canvas');
+            this.canvas.style.position = 'fixed';
+            this.canvas.style.top = '0';
+            this.canvas.style.left = '0';
+            this.canvas.style.pointerEvents = 'none';
+            this.canvas.style.zIndex = '9999';
+            document.body.appendChild(this.canvas);
+            this.canvasContext = this.canvas.getContext('2d');
+            this.resizeCanvas();
+            window.addEventListener('resize', () => this.resizeCanvas());
+            this.confetti = [];
+            this.animationTimer = null;
+        }
+
+        JSConfetti.prototype.resizeCanvas = function() {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
+        };
+
+        JSConfetti.prototype.addConfetti = function() {
+            for (let i = 0; i < this.confettiNumber; i++) {
+                this.confetti.push(this.randomConfetti(i));
+            }
+            if (this.animationTimer === null) {
+                this.startAnimation();
+            }
+        };
+
+        JSConfetti.prototype.randomConfetti = function(i) {
+            return {
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height - this.canvas.height,
+                r: Math.floor(Math.random() * 6) + this.confettiRadius,
+                d: Math.random() * this.confettiAnimEnter + this.confettiAnimEnter,
+                color: this.confettiColors[Math.floor(Math.random() * this.confettiColors.length)],
+                tilt: Math.floor(Math.random() * 10) - 10,
+                tiltAngle: 0,
+                tiltAngleSpeed: Math.random() * 0.07 + 0.05,
+                delay: i * 0.005
+            };
+        };
+
+        JSConfetti.prototype.startAnimation = function() {
+            this.animationTimer = requestAnimationFrame(() => this.drawConfetti());
+        };
+
+        JSConfetti.prototype.drawConfetti = function() {
+            this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            let nextConfetti = [];
+            this.confetti.forEach((confetto) => {
+                let {x, y, r, d, color, tilt, tiltAngle, tiltAngleSpeed, delay} = confetto;
+                if (delay <= 0) {
+                    confetto.x += Math.sin(confetto.tiltAngle);
+                    confetto.y += (Math.cos(confetto.tiltAngle) + d + 3 + (r / 2)) * 0.5;
+                    confetto.tiltAngle += confetto.tiltAngleSpeed;
+                    confetto.tilt = Math.sin(confetto.tiltAngle);
+                    if (confetto.y > this.canvas.height) {
+                        confetto.x = Math.random() * this.canvas.width;
+                        confetto.y = -confetto.r;
+                        confetto.d = Math.random() * this.confettiAnimEnter + this.confettiAnimEnter;
+                        confetto.color = this.confettiColors[Math.floor(Math.random() * this.confettiColors.length)];
+                        confetto.tilt = Math.floor(Math.random() * 10) - 10;
+                        confetto.tiltAngle = 0;
+                        confetto.delay = 0;
+                    }
+                    nextConfetti.push(confetto);
+                    this.canvasContext.beginPath();
+                    this.canvasContext.lineWidth = confetto.r * 2;
+                    this.canvasContext.strokeStyle = confetto.color;
+                    this.canvasContext.moveTo(confetto.x + confetto.tilt + confetto.r, confetto.y);
+                    this.canvasContext.lineTo(confetto.x + confetto.tilt, confetto.y + confetto.tilt + confetto.r);
+                    this.canvasContext.stroke();
+                } else {
+                    confetto.delay--;
+                    nextConfetti.push(confetto);
+                }
+            });
+            this.confetti = nextConfetti;
+            this.animationTimer = requestAnimationFrame(() => this.drawConfetti());
+        };
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

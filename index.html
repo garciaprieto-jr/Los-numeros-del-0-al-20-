@@ -41,18 +41,35 @@
         <h2>¡Oh no!</h2>
         <p>Has cometido 3 errores.</p>
         <button id="playAgainBtn1" class="playAgainBtn">Volver a jugar</button>
+        <button id="emailBtn1" class="emailBtn">Enviar resultados al maestro</button>
     </div>
 
     <div id="wellDone-screen" class="hidden game-end-screen">
         <h2>¡Muy bien!</h2>
         <p>¡Sigue practicando para alcanzar la puntuación perfecta!</p>
         <button id="playAgainBtn2" class="playAgainBtn">Volver a jugar</button>
+        <button id="emailBtn2" class="emailBtn">Enviar resultados al maestro</button>
     </div>
     
     <div id="perfect-screen" class="hidden game-end-screen">
         <h2>¡Perfecto! 👍</h2>
         <p>¡Has respondido a todas las preguntas sin cometer errores!</p>
         <button id="playAgainBtn3" class="playAgainBtn">Volver a jugar</button>
+        <button id="emailBtn3" class="emailBtn">Enviar resultados al maestro</button>
+    </div>
+
+    <div id="emailModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Enviar resultados al maestro</h3>
+            <p>Por favor, completa los siguientes campos:</p>
+            <input type="text" id="studentNameInput" placeholder="Nombre del alumno">
+            <input type="email" id="studentEmailInput" placeholder="Correo del alumno">
+            <input type="hidden" id="teacherEmailInput" value="aprendeconjoseraul@gmail.com">
+            <div class="modal-buttons">
+                <button id="sendEmailNowBtn" class="send-btn">Enviar</button>
+                <button id="cancelEmailBtn" class="cancel-btn">Cancelar</button>
+            </div>
+        </div>
     </div>
 
     <script>

@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', () => {
+
+   document.addEventListener('DOMContentLoaded', () => {
     // --- Elementos del DOM ---
     const startScreen = document.getElementById('start-screen');
     const gameContainer = document.getElementById('game-container');
@@ -23,9 +24,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const playAgainBtn2 = document.getElementById('playAgainBtn2');
     const playAgainBtn3 = document.getElementById('playAgainBtn3');
 
-    // --- Efectos de sonido ---
+    // --- Botones de enviar resultados por correo ---
+    const emailBtn1 = document.getElementById('emailBtn1');
+    const emailBtn2 = document.getElementById('emailBtn2');
+    const emailBtn3 = document.getElementById('emailBtn3');
+
+    // --- Elementos del Modal ---
+    const emailModal = document.getElementById('emailModal');
+    const sendEmailNowBtn = document.getElementById('sendEmailNowBtn');
+    const cancelEmailBtn = document.getElementById('cancelEmailBtn');
+    const studentNameInput = document.getElementById('studentNameInput');
+    const studentEmailInput = document.getElementById('studentEmailInput');
+    const teacherEmailInput = document.getElementById('teacherEmailInput');
+
+   // --- Efectos de sonido (para poner el audio incorrecto hay que reemplazar (no) por (Wrong%20Answer)) ---
     const soundEffectCorrect = 'https://raw.githubusercontent.com/garciaprieto-jr/los-numeros-0-20---Harry-potter-juego-/garciaprieto-jr-audio/Right%20Answer.mp3';
-    const soundEffectIncorrect = 'https://raw.githubusercontent.com/garciaprieto-jr/los-numeros-0-20---Harry-potter-juego-/garciaprieto-jr-audio/Wrong%20Answer.mp3';
+    const soundEffectIncorrect = 'https://raw.githubusercontent.com/garciaprieto-jr/los-numeros-0-20---Harry-potter-juego-/garciaprieto-jr-audio/no.mp3';
 
     // --- Datos y variables de estado del juego ---
     const allGameData = [
@@ -61,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let shuffledGameData = [];
     let nextCountdownInterval;
     let confettiInstance = null; // Variable para mantener la instancia de JSConfetti
+    let roundResults = []; // Nuevo array para guardar los resultados detallados
 
     // --- Funciones auxiliares ---
     const getRandomColor = () => {
@@ -154,7 +169,14 @@ document.addEventListener('DOMContentLoaded', () => {
         isClickable = false;
         
         const isCorrect = selectedNumber === currentRoundData.correct;
-        const isLastRound = (correctCount + incorrectCount + 1) === maxRounds; 
+        const isLastRound = (correctCount + incorrectCount + 1) === maxRounds;
+
+        // Añadir el resultado de la ronda al registro
+        roundResults.push({
+            question: currentRoundData.correct,
+            answer: selectedNumber,
+            isCorrect: isCorrect
+        });
         
         if (isCorrect) {
             feedback.textContent = '¡Correcto!';
@@ -168,8 +190,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 3000);
             displayEmoji(true, isLastRound);
             correctCount++;
+
+            // Muestra el botón y el contador para la siguiente pregunta
+            nextBtn.classList.remove('hidden');
+            let nextCountdown = 30;
+            nextCountdownEl.textContent = `Siguiente en: ${nextCountdown}`;
+
+            nextCountdownInterval = setInterval(() => {
+                nextCountdown--;
+                if (nextCountdown >= 0) {
+                    nextCountdownEl.textContent = `Siguiente en: ${nextCountdown}`;
+                }
+                if (nextCountdown <= 0) {
+                    clearInterval(nextCountdownInterval);
+                    generateRound();
+                }
+            }, 1000);
+
         } else {
-            feedback.textContent = '¡Incorrecto! Intenta de nuevo.';
+            feedback.textContent = '¡Incorrecto! Vuelve a intentarlo.';
             feedback.style.color = '#E53935';
             selectedButton.classList.add('incorrect');
             const correctOption = document.querySelector(`.option-btn span[data-number="${currentRoundData.correct}"]`);
@@ -184,29 +223,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 3000);
             displayEmoji(false, isLastRound);
             incorrectCount++;
+
+            // Si es incorrecto, no se avanza. Se resetean los botones y se permite volver a hacer clic.
+            setTimeout(() => {
+                const buttons = document.querySelectorAll('.option-btn');
+                buttons.forEach(btn => {
+                    btn.classList.remove('correct', 'incorrect');
+                });
+                feedback.textContent = 'Intenta de nuevo';
+                isClickable = true; // Vuelve a habilitar los clics para repetir
+            }, 3000);
         }
         
         correctCountEl.textContent = correctCount;
         incorrectCountEl.textContent = incorrectCount;
-        nextBtn.classList.remove('hidden');
-        
-        if (incorrectCount >= 3 || (correctCount + incorrectCount) === maxRounds) {
-            endGame();
-        } else {
-            let nextCountdown = 5;
-            nextCountdownEl.textContent = `Siguiente en: ${nextCountdown}`;
-
-            nextCountdownInterval = setInterval(() => {
-                nextCountdown--;
-                if (nextCountdown >= 0) {
-                    nextCountdownEl.textContent = `Siguiente en: ${nextCountdown}`;
-                }
-                if (nextCountdown <= 0) {
-                    clearInterval(nextCountdownInterval);
-                    generateRound();
-                }
-            }, 1000);
-        }
     };
 
     const endGame = () => {
@@ -247,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOverScreen.classList.add('hidden');
         wellDoneScreen.classList.add('hidden');
         perfectScreen.classList.add('hidden');
+        emailModal.classList.add('hidden');
         startScreen.classList.remove('hidden');
         correctCount = 0;
         incorrectCount = 0;
@@ -257,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (confettiInstance && confettiInstance.canvas) {
             confettiInstance.canvas.remove();
         }
+        roundResults = []; // Restablecer el registro de resultados
     };
 
     const startGame = (mode) => {
@@ -280,6 +312,47 @@ document.addEventListener('DOMContentLoaded', () => {
         generateRound();
     };
 
+    // Función para mostrar el modal y no enviar el correo directamente
+    const showEmailModal = () => {
+        emailModal.classList.remove('hidden');
+    };
+
+    // Función para construir y enviar el correo con la información del formulario
+    const sendEmail = () => {
+        const studentName = studentNameInput.value.trim();
+        const studentEmail = studentEmailInput.value.trim();
+        const teacherEmail = teacherEmailInput.value.trim();
+
+        if (!studentName || !teacherEmail) {
+            alert("Por favor, introduce tu nombre y el correo del maestro.");
+            return;
+        }
+
+        // Generar la lista detallada de respuestas
+        let resultsList = '';
+        roundResults.forEach((result, index) => {
+            const status = result.isCorrect ? 'Correcta' : 'Incorrecta';
+            resultsList += `Pregunta ${index + 1}: El número era ${result.question}. Tu respuesta fue ${result.answer}. Estado: ${status}.\n`;
+        });
+
+        const subject = encodeURIComponent(`Resultados de ${studentName}: Juego de Números`);
+        const body = encodeURIComponent(
+            `Hola maestro,\n\nSoy ${studentName}.\n\n` +
+            `Estos son mis resultados del juego de números:\n` +
+            `Aciertos: ${correctCount}\n` +
+            `Errores: ${incorrectCount}\n\n` +
+            `Detalle de las respuestas:\n\n` +
+            resultsList +
+            `Mi correo electrónico es: ${studentEmail}`
+        );
+
+        const mailtoLink = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+        window.location.href = mailtoLink;
+        
+        // Ocultar el modal después de que se genere el enlace
+        emailModal.classList.add('hidden');
+    };
+
     // --- Event Listeners para los botones de inicio ---
     startGame0_10Btn.addEventListener('click', () => startGame('0-10'));
     startGame11_20Btn.addEventListener('click', () => startGame('11-20'));
@@ -293,4 +366,16 @@ document.addEventListener('DOMContentLoaded', () => {
     playAgainBtn1.addEventListener('click', resetGame);
     playAgainBtn2.addEventListener('click', resetGame);
     playAgainBtn3.addEventListener('click', resetGame);
+
+    // --- Event Listeners para los botones de enviar por correo ---
+    // Ahora, al hacer clic, se muestra el modal
+    emailBtn1.addEventListener('click', showEmailModal);
+    emailBtn2.addEventListener('click', showEmailModal);
+    emailBtn3.addEventListener('click', showEmailModal);
+
+    // Event Listeners para los botones del modal
+    sendEmailNowBtn.addEventListener('click', sendEmail);
+    cancelEmailBtn.addEventListener('click', () => {
+        emailModal.classList.add('hidden');
+    });
 });
